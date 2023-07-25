@@ -17,10 +17,32 @@ import entities.ImportedProduct;
 public class Program {
     public static void main(String[] args) throws IOException {
         Locale.setDefault(Locale.US);
-        Scanner sc = new Scanner(System.in);
         List<Product> products = new ArrayList<Product>();
-        int choice; char type = '0';
-        File file = new File("products.txt"); FileWriter writer = new FileWriter("products.txt");
+        File file = new File("products.txt");
+        if(file.exists()){
+            Scanner reader = new Scanner(new File("products.txt"));
+            int quant = Integer.parseInt(String.valueOf(reader.nextLine()));
+            for(int i = 0; i < quant; i++){
+                String type = String.valueOf(reader.nextLine());
+                if(type.equals("Product")){
+                    String name = String.valueOf(reader.nextLine());
+                    Double price = Double.parseDouble(String.valueOf(reader.nextLine()));
+                    products.add(new Product(name, price));
+                }else if(type.equals("UsedProduct")){
+                    String name = String.valueOf(reader.nextLine());
+                    Double price = Double.parseDouble(String.valueOf(reader.nextLine()));
+                    LocalDate date = LocalDate.parse(String.valueOf(reader.nextLine()), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    products.add(new UsedProduct(name, price, date));
+                }else if(type.equals("ImportedProduct")){
+                    String name = String.valueOf(reader.nextLine());
+                    Double price = Double.parseDouble(String.valueOf(reader.nextLine()));
+                    Double customsfee = Double.parseDouble(String.valueOf(reader.nextLine()));
+                    products.add(new ImportedProduct(name, price, customsfee));
+                }
+            }
+            reader.close();
+        }
+        int choice; char type = '0'; Scanner sc = new Scanner(System.in);
         do{
             do{
                 System.out.print("Insert a command (1 to add a product or 2 to see the products): ");
@@ -67,6 +89,7 @@ public class Program {
         if(file.exists()){
             file.delete();
         }
+        FileWriter writer = new FileWriter("products.txt");
         writer.write(products.size() + "\n");
         for (Product product : products) {
             writer.write(product.getClass().getSimpleName() + "\n");
