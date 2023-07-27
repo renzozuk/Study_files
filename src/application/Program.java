@@ -1,14 +1,16 @@
 package application;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import entities.Product;
 import entities.UsedProduct;
@@ -53,11 +55,15 @@ public class Program {
             }
             reader.close();
         }
-        int choice; char type = '0'; Scanner sc = new Scanner(System.in);
+        int choice = 0; char type = '0'; Scanner sc = new Scanner(System.in);
         do{
             do{
-                System.out.print("Insert a command (1 to add a product or 2 to see the products): ");
-                choice = sc.nextInt();
+                try{
+                    System.out.print("Insert a command (1 to add a product or 2 to see the products): ");
+                    choice = sc.nextInt();
+                }catch(InputMismatchException e){
+                    System.out.println("You must put an integer (0, 1 or 2) as a command. Any other command will not work as well.");
+                }
             }while(choice > 2 || choice < 0);
             clrsrc();
             switch(choice){
@@ -69,22 +75,29 @@ public class Program {
                     sc.nextLine();
                     System.out.print("Choose the name: ");
                     String name = sc.nextLine();
-                    System.out.print("Choose the price: ");
-                    double price = sc.nextDouble();
-                    switch(type){
-                        case 'c':
-                            products.add(new Product(name, price));
-                            break;
-                        case 'u':
-                            System.out.print("Type the date of manufacturing: ");
-                            LocalDate date = LocalDate.parse(sc.next(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                            products.add(new UsedProduct(name, price, date));
-                            break;
-                        case 'i':
-                            System.out.print("Type the customs fee: ");
-                            double customsfee = sc.nextDouble();
-                            products.add(new ImportedProduct(name, price, customsfee));
-                            break;
+                    try{
+                        System.out.print("Choose the price: ");
+                        double price = sc.nextDouble();
+                        switch(type){
+                            case 'c':
+                                products.add(new Product(name, price));
+                                break;
+                            case 'u':
+                                System.out.print("Type the date of manufacturing: ");
+                                LocalDate date = LocalDate.parse(sc.next(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                                products.add(new UsedProduct(name, price, date));
+                                break;
+                            case 'i':
+                                System.out.print("Type the customs fee: ");
+                                double customsfee = sc.nextDouble();
+                                products.add(new ImportedProduct(name, price, customsfee));
+                                break;
+                        }
+                    }catch(InputMismatchException e){
+                        sc.nextLine();
+                        System.out.println("The cost of the product must be a number.");
+                    }catch(DateTimeParseException e){
+                        System.out.println("You didn't put a valid date. The valid date format is: \"dd/MM/yyyy\"");
                     }
                     System.out.println();
                     break;
