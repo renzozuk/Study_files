@@ -15,7 +15,18 @@ import entities.UsedProduct;
 import entities.ImportedProduct;
 
 public class Program {
+    static void clrsrc(){
+        try{
+            if(System.getProperty("os.name").contains("Windows")){
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            }else{
+                Runtime.getRuntime().exec("clear");
+            }
+        }catch(IOException | InterruptedException ex) {}
+    }
+
     public static void main(String[] args) throws IOException {
+        clrsrc();
         Locale.setDefault(Locale.US);
         List<Product> products = new ArrayList<Product>();
         File file = new File("products.txt");
@@ -48,6 +59,7 @@ public class Program {
                 System.out.print("Insert a command (1 to add a product or 2 to see the products): ");
                 choice = sc.nextInt();
             }while(choice > 2 || choice < 0);
+            clrsrc();
             switch(choice){
                 case 1:
                     do{
@@ -74,10 +86,11 @@ public class Program {
                             products.add(new ImportedProduct(name, price, customsfee));
                             break;
                     }
+                    System.out.println();
                     break;
                 case 2:
                     if(products.size() == 0){
-                        System.out.println("There are no products in the system.");
+                        System.out.print("There are no products in the system.\n\n");
                     }
                     for(Product product: products){
                         System.out.println(product.priceTag());
